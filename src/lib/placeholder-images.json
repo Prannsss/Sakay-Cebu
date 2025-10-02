@@ -1,0 +1,52 @@
+{
+  "placeholderImages": [
+    {
+      "id": "sedan-1",
+      "description": "A modern white sedan parked in a city.",
+      "imageUrl": "https://images.unsplash.com/photo-1737051484020-8b7cb4d22f49?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx3aGl0ZSUyMHNlZGFufGVufDB8fHx8MTc1OTMzNTMxOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "white sedan"
+    },
+    {
+      "id": "suv-1",
+      "description": "A rugged black SUV on a mountain road.",
+      "imageUrl": "https://images.unsplash.com/photo-1735620731955-b047a7122892?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxibGFjayUyMHN1dnxlbnwwfHx8fDE3NTkyODEwMjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "black suv"
+    },
+    {
+      "id": "van-1",
+      "description": "A spacious silver van ready for a family trip.",
+      "imageUrl": "https://images.unsplash.com/photo-1658237345392-812d9a2d757d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzaWx2ZXIlMjB2YW58ZW58MHx8fHwxNzU5MzkzMzI4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "silver van"
+    },
+    {
+      "id": "motorcycle-1",
+      "description": "A sleek red motorcycle on a coastal highway.",
+      "imageUrl": "https://images.unsplash.com/photo-1571568495363-99048b36777b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxyZWQlMjBtb3RvcmN5Y2xlfGVufDB8fHx8MTc1OTI4NzE0Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "red motorcycle"
+    },
+    {
+      "id": "sedan-2",
+      "description": "A blue compact sedan perfect for city driving.",
+      "imageUrl": "https://images.unsplash.com/photo-1618767036477-2665a9459574?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxibHVlJTIwc2VkYW58ZW58MHx8fHwxNzU5MzQwMDM0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "blue sedan"
+    },
+    {
+      "id": "suv-2",
+      "description": "A family-friendly white SUV with a rooftop carrier.",
+      "imageUrl": "https://images.unsplash.com/photo-1684849311625-b66671fb66d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx3aGl0ZSUyMHN1dnxlbnwwfHx8fDE3NTkzMDA2NTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "white suv"
+    },
+    {
+      "id": "motorcycle-2",
+      "description": "A classic black cruiser motorcycle.",
+      "imageUrl": "https://images.unsplash.com/photo-1608272790986-798dbf608552?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxibGFjayUyMG1vdG9yY3ljbGV8ZW58MHx8fHwxNzU5NDAwMTIyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "black motorcycle"
+    },
+    {
+      "id": "van-2",
+      "description": "A white passenger van.",
+      "imageUrl": "https://images.unsplash.com/photo-1742858492775-8f58f645aa12?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx3aGl0ZSUyMHZhbnxlbnwwfHx8fDE3NTkyODEwMjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "white van"
+    }
+  ]
+}
