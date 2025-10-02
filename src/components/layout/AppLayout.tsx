@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import AppSidebar from '@/components/layout/AppSidebar';
+import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import { ThemeToggle } from '../theme-toggle';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -20,17 +21,27 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (showSidebar) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <AppSidebar />
-        <main className="flex-1 flex flex-col">
-          <div className="p-4 sm:p-6 md:p-8 flex-1">
-            <div className='flex justify-end'>
+      <>
+        <div className="flex min-h-screen bg-background">
+          {/* Desktop Sidebar */}
+          <AppSidebar />
+          
+          {/* Main Content */}
+          <main className="flex-1 flex flex-col">
+            {/* Page Content */}
+            <div className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
+              {/* Desktop Theme Toggle */}
+              <div className='hidden lg:flex justify-end mb-6'>
                 <ThemeToggle />
+              </div>
+              {children}
             </div>
-            {children}
-          </div>
-        </main>
-      </div>
+          </main>
+        </div>
+        
+        {/* Mobile Bottom Navigation */}
+        <MobileBottomNav />
+      </>
     );
   }
   

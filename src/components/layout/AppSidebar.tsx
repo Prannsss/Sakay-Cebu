@@ -160,33 +160,12 @@ const AppSidebar = () => {
   );
 
   return (
-    <>
-        <aside className="sticky top-0 h-screen w-64 flex-col border-r bg-background hidden lg:flex">
-            <div className="flex h-16 shrink-0 items-center justify-center border-b px-6">
-                <Logo />
-            </div>
-            {sidebarContent}
-        </aside>
-         <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-background px-4 lg:hidden">
-            <Logo />
-            <div className='flex items-center gap-2'>
-              <ThemeToggle />
-              <Sheet>
-              <SheetTrigger asChild>
-                  <Button variant="outline" size="icon">
-                  <Menu className="h-6 w-6" />
-                  </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="flex flex-col p-0">
-                  <div className="flex h-16 shrink-0 items-center justify-center border-b px-6">
-                      <Logo />
-                  </div>
-                  {sidebarContent}
-              </SheetContent>
-              </Sheet>
-            </div>
-      </header>
-    </>
+    <aside className="sticky top-0 h-screen w-64 flex-col border-r bg-background hidden lg:flex">
+      <div className="flex h-16 shrink-0 items-center justify-center border-b px-6">
+        <Logo />
+      </div>
+      {sidebarContent}
+    </aside>
   );
 };
 

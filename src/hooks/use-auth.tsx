@@ -69,8 +69,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    // Clear user state
     setUser(null);
-    router.push('/login');
+    // Clear localStorage
+    localStorage.removeItem('sakay-cebu-user');
+    // Force immediate redirect
+    window.location.replace('/login');
   };
 
   const value = { user, login, signup, logout, users, providers, setUsers, setProviders };

@@ -48,34 +48,37 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
+        <div className="container flex h-14 items-center px-4">
             <Logo />
             <div className="flex flex-1 items-center justify-end space-x-2">
-                <nav className="flex items-center">
+                <nav className="flex items-center space-x-2 sm:space-x-4">
                     <ThemeToggle />
-                    <Button variant="ghost" asChild>
+                    <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
                       <Link href="/login">Login</Link>
                     </Button>
-                    <Button asChild>
-                      <Link href="/login">Sign Up</Link>
+                    <Button size="sm" asChild>
+                      <Link href="/login">
+                        <span className="hidden sm:inline">Sign Up</span>
+                        <span className="sm:hidden">Join</span>
+                      </Link>
                     </Button>
                 </nav>
             </div>
         </div>
       </header>
-      <main className="flex-1 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
-        <section className="w-full flex items-center justify-center bg-background" style={{ minHeight: 'calc(100vh - 57px)'}}>
+      <main className="flex-1">
+        <section className="w-full flex items-center justify-center bg-background min-h-screen">
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h1 className="text-4xl font-bold tracking-tighter text-foreground sm:text-5xl md:text-6xl lg:text-7xl/none font-headline">
+            <div className="flex flex-col items-center space-y-6 text-center">
+              <div className="space-y-4">
+                <h1 className="text-3xl font-bold tracking-tighter text-foreground sm:text-4xl md:text-5xl lg:text-6xl font-headline">
                   Your Ride, Your Adventure
                 </h1>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
+                <p className="mx-auto max-w-[600px] text-muted-foreground text-sm sm:text-base md:text-lg lg:text-xl px-4">
                   Discover the perfect vehicle for your Cebu journey. Unbeatable prices, unmatched freedom, and a seamless booking experience.
                 </p>
               </div>
-              <div className="space-x-4">
+              <div className="flex flex-col sm:flex-row gap-4 sm:space-x-4 w-full sm:w-auto px-4 sm:px-0">
                 <Button size="lg" asChild>
                   <Link href="/login">
                     Get Started

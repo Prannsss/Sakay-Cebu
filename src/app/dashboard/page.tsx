@@ -12,6 +12,7 @@ import { Booking, Vehicle } from '@/lib/types';
 import { initialVehicles } from '@/lib/data';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -41,22 +42,27 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold font-headline">My Dashboard</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl sm:text-3xl font-bold font-headline">My Dashboard</h1>
+        <div className="lg:hidden">
+          <ThemeToggle />
+        </div>
+      </div>
       <p className="text-muted-foreground">Welcome back, {user.name}! Here are your rentals.</p>
 
       {userBookings.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 sm:grid-cols-1 lg:grid-cols-2">
             {userBookings.map(booking => {
                 const vehicle = vehicles.find(v => v.id === booking.vehicleId);
                 if (!vehicle) return null;
                 const image = PlaceHolderImages.find(img => img.id === vehicle.photos[0]);
                 return (
                     <Card key={booking.id}>
-                        <CardHeader className='flex-row items-start gap-4'>
-                            {image && <Image src={image.imageUrl} alt={vehicle.model} width={120} height={80} className='rounded-lg' />}
-                            <div>
-                                <CardTitle>{vehicle.model}</CardTitle>
-                                <CardDescription>{vehicle.type} - {vehicle.location}</CardDescription>
+                        <CardHeader className='flex-col sm:flex-row items-start gap-4'>
+                            {image && <Image src={image.imageUrl} alt={vehicle.model} width={120} height={80} className='rounded-lg w-full sm:w-[120px] h-auto sm:h-[80px] object-cover' />}
+                            <div className="flex-1">
+                                <CardTitle className="text-lg sm:text-xl">{vehicle.model}</CardTitle>
+                                <CardDescription className="text-sm">{vehicle.type} - {vehicle.location}</CardDescription>
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -77,7 +83,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <Button asChild>
-              <Link href="/">Find a Vehicle</Link>
+              <Link href="/vehicles">Find a Vehicle</Link>
             </Button>
           </CardContent>
         </Card>
