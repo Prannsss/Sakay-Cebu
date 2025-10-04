@@ -55,7 +55,8 @@ export default function ProviderDashboardPage() {
   const verifiedVehicles = providerVehicles.filter(vehicle => vehicle.verified).length;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="fixed inset-0 left-0 top-0 bottom-0 lg:left-64 bg-background overflow-auto">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 pb-20 lg:pb-8">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <div>
@@ -244,6 +245,7 @@ export default function ProviderDashboardPage() {
             </Button>
           </CardContent>
         </Card>
+      </div>
       </div>
       </div>
     </div>

@@ -40,7 +40,7 @@ const AppSidebar = () => {
   });
 
   const providerLinks = [
-    { href: '/provider/dashboard', label: 'My Vehicles', icon: Car },
+    { href: '/provider/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/provider/add-vehicle', label: 'Add Vehicle', icon: PlusCircle },
     { href: '/provider/all-vehicles', label: 'View All Vehicles', icon: List },
     { href: '/provider/rental-requests', label: 'Rental Requests', icon: ClipboardList },

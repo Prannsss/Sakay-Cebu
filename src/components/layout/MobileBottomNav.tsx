@@ -28,7 +28,7 @@ const MobileBottomNav = () => {
   ];
 
   const providerLinks = [
-    { href: '/provider/dashboard', label: 'Vehicles', icon: Car },
+    { href: '/provider/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/provider/all-vehicles', label: 'All', icon: List },
     { href: '/provider/rental-requests', label: 'Requests', icon: ClipboardList },
     { href: '/messages-provider', label: 'Messages', icon: MessageCircle },

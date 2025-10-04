@@ -33,10 +33,12 @@ import {
 import useLocalStorage from '@/hooks/use-local-storage';
 import { Message, Conversation, Vehicle, User as UserType } from '@/lib/types';
 import { initialVehicles, allUsers } from '@/lib/data';
+import { useBottomNav } from '@/components/layout/AppLayout';
 
 export default function ProviderMessagesPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const { setHideBottomNav } = useBottomNav();
   const [vehicles] = useLocalStorage<Vehicle[]>('sakay-cebu-vehicles', initialVehicles);
   const [conversations, setConversations] = useLocalStorage<Conversation[]>('sakay-cebu-conversations', []);
   const [users] = useLocalStorage<UserType[]>('sakay-cebu-users', allUsers);
@@ -65,6 +67,14 @@ export default function ProviderMessagesPage() {
       setIsLoading(false);
     }
   }, [user, router]);
+
+  // Hide bottom nav when conversation is selected on mobile
+  useEffect(() => {
+    setHideBottomNav(!!selectedConversation);
+    
+    // Cleanup: show bottom nav when component unmounts
+    return () => setHideBottomNav(false);
+  }, [selectedConversation, setHideBottomNav]);
 
   // Auto-scroll to bottom when messages change
   const [conversationMessages, setConversationMessages] = useState<Message[]>([]);
