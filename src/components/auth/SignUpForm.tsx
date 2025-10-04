@@ -76,7 +76,7 @@ export default function SignUpForm({ onToggleMode }: SignUpFormProps) {
     <>
       <div className='mb-6 text-center'>
         <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
-        <CardDescription className='mt-2'>Join Sakay Cebu to start your journey.</CardDescription>
+        <CardDescription className='mt-2'>Join Sakay Cebu and start renting.</CardDescription>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -87,7 +87,7 @@ export default function SignUpForm({ onToggleMode }: SignUpFormProps) {
               <FormItem>
                 <FormLabel>Full Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Doe" {...field} />
+                  <Input placeholder="Juan dela Cruz" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -100,7 +100,7 @@ export default function SignUpForm({ onToggleMode }: SignUpFormProps) {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="you@example.com" {...field} />
+                  <Input placeholder="juandelacruz@gmail.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

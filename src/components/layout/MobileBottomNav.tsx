@@ -6,46 +6,41 @@ import { useAuth } from '@/hooks/use-auth';
 import {
   Car,
   LayoutDashboard,
-  LogOut,
   PlusCircle,
-  ShieldCheck,
   Sparkles,
   Compass,
   User,
+  MessageCircle,
+  Calendar as CalendarIcon,
+  ClipboardList,
+  List,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useState } from 'react';
 
 const MobileBottomNav = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const pathname = usePathname();
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const navLinks = [
-    ...(user ? [{ href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard }] : []),
-    { href: '/vehicles', label: 'Explore', icon: Compass },
-    { href: '/smart-deals', label: 'Deals', icon: Sparkles },
+    ...(user && user.role !== 'provider' ? [{ href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard }] : []),
+    ...(user?.role !== 'provider' ? [{ href: '/vehicles', label: 'Explore', icon: Compass }] : []),
+    ...(user?.role !== 'provider' ? [{ href: '/smart-deals', label: 'Deals', icon: Sparkles }] : []),
+    ...(user && user.role !== 'provider' ? [{ href: '/messages-client', label: 'Messages', icon: MessageCircle }] : []),
   ];
 
   const providerLinks = [
     { href: '/provider/dashboard', label: 'Vehicles', icon: Car },
-    { href: '/provider/add-vehicle', label: 'Add', icon: PlusCircle },
+    { href: '/provider/all-vehicles', label: 'All', icon: List },
+    { href: '/provider/rental-requests', label: 'Requests', icon: ClipboardList },
+    { href: '/messages-provider', label: 'Messages', icon: MessageCircle },
   ];
-
-  const adminLinks = [{ href: '/admin/dashboard', label: 'Admin', icon: ShieldCheck }];
 
   let allLinks = [...navLinks];
   
   if (user?.role === 'provider') {
     allLinks = allLinks.concat(providerLinks);
   }
-  
-  if (user?.role === 'admin') {
-    allLinks = allLinks.concat(adminLinks);
-  }
 
-  // Limit to 5 items for mobile
+  // Limit to 5 items for mobile (4 nav + 1 profile)
   const displayLinks = allLinks.slice(0, 4);
   
   return (
@@ -68,35 +63,17 @@ const MobileBottomNav = () => {
           ))}
           
           {user && (
-            <Popover open={isProfileOpen} onOpenChange={setIsProfileOpen}>
-              <PopoverTrigger asChild>
-                <div className="flex flex-col items-center justify-center p-2 rounded-lg transition-colors text-muted-foreground hover:text-primary hover:bg-primary/5 cursor-pointer">
-                  <User className="h-5 w-5" />
-                  <span className="text-xs mt-1">Profile</span>
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-48 p-2 mb-2" align="end" side="top">
-                <div className="space-y-2">
-                  <div className="px-2 py-1 border-b">
-                    <p className="font-medium text-sm">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      logout();
-                      setIsProfileOpen(false);
-                    }}
-                    className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <Link
+              href="/profile"
+              className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors ${
+                pathname === '/profile'
+                  ? 'text-primary bg-primary/10'
+                  : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
+              }`}
+            >
+              <User className="h-5 w-5" />
+              <span className="text-xs mt-1">Profile</span>
+            </Link>
           )}
         </div>
       </div>

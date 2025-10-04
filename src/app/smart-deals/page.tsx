@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, MapPin, Clock, Tag } from 'lucide-react';
-import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function SmartDealsPage() {
   const deals = [
@@ -59,13 +58,10 @@ export default function SmartDealsPage() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-8">
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div>
           <h1 className="text-2xl sm:text-3xl font-bold font-headline">Smart Deals</h1>
-          <div className="lg:hidden">
-            <ThemeToggle />
-          </div>
         </div>
         <div className="text-center space-y-4">
           <div className="flex justify-center">

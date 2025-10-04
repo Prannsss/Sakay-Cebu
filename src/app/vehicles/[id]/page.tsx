@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { DateRange } from 'react-day-picker';
 import { addDays, differenceInDays } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function VehicleDetailsPage() {
   const { id } = useParams();
@@ -65,8 +66,11 @@ export default function VehicleDetailsPage() {
       vehicleId: vehicle.id,
       startDate: date.from.toISOString(),
       endDate: date.to.toISOString(),
+      startTime: '09:00',
+      endTime: '18:00',
       totalPrice: differenceInDays(date.to, date.from) * vehicle.pricePerDay,
-      status: 'confirmed',
+      status: 'pending',
+      createdAt: new Date().toISOString(),
     };
 
     setBookings([...bookings, newBooking]);
@@ -87,14 +91,22 @@ export default function VehicleDetailsPage() {
   }
 
   const image = PlaceHolderImages.find(img => img.id === vehicle.photos[0]);
+  const isBase64 = vehicle.photos[0]?.startsWith('data:image');
   const bookingDays = date?.from && date?.to ? differenceInDays(date.to, date.from) : 0;
   const totalPrice = bookingDays * vehicle.pricePerDay;
 
   return (
-    <div className="container mx-auto max-w-6xl">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-                {image && (
+                {isBase64 ? (
+                    <img
+                    src={vehicle.photos[0]}
+                    alt={vehicle.model}
+                    className="rounded-lg object-cover w-full aspect-video"
+                    />
+                ) : image ? (
                     <Image
                     src={image.imageUrl}
                     alt={vehicle.model}
@@ -103,6 +115,10 @@ export default function VehicleDetailsPage() {
                     className="rounded-lg object-cover w-full aspect-video"
                     data-ai-hint={image.imageHint}
                     />
+                ) : (
+                    <div className="rounded-lg bg-muted w-full aspect-video flex items-center justify-center">
+                        <span className="text-muted-foreground">No image available</span>
+                    </div>
                 )}
             </div>
             <div className="space-y-4">
@@ -160,6 +176,7 @@ export default function VehicleDetailsPage() {
                 </CardContent>
             </Card>
         </div>
+      </div>
     </div>
   );
 }

@@ -40,10 +40,11 @@ const VehicleFilters = ({ onFilterChange }: VehicleFiltersProps) => {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Types</SelectItem>
-                            <SelectItem value="Sedan">Sedan</SelectItem>
-                            <SelectItem value="SUV">SUV</SelectItem>
-                            <SelectItem value="Motorcycle">Motorcycle</SelectItem>
-                            <SelectItem value="Van">Van</SelectItem>
+                            <SelectItem value="Cars">Cars</SelectItem>
+                            <SelectItem value="Motorcycles">Motorcycles</SelectItem>
+                            <SelectItem value="Vans">Vans</SelectItem>
+                            <SelectItem value="Trucks">Trucks</SelectItem>
+                            <SelectItem value="Multicab">Multicab</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

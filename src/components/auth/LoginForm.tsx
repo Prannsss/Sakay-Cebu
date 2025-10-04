@@ -70,7 +70,7 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="you@example.com" {...field} />
+                  <Input placeholder="Email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

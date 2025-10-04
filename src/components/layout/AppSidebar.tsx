@@ -7,37 +7,30 @@ import {
   Car,
   LayoutDashboard,
   LogIn,
-  LogOut,
   PlusCircle,
-  ShieldCheck,
   Sparkles,
   UserPlus,
   Compass,
   User,
+  MessageCircle,
+  Calendar as CalendarIcon,
+  ClipboardList,
+  List,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import Logo from '@/components/Logo';
-import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
-import { Menu } from 'lucide-react';
-import { ThemeToggle } from '../theme-toggle';
 
 const AppSidebar = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const pathname = usePathname();
 
   const navLinks = [
-    ...(user ? [{ href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard }] : []),
-    { href: '/vehicles', label: 'Explore', icon: Compass },
-    { href: '/smart-deals', label: 'Smart Deals', icon: Sparkles },
+    ...(user && user.role !== 'provider' ? [{ href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard }] : []),
+    ...(user?.role !== 'provider' ? [{ href: '/vehicles', label: 'Explore', icon: Compass }] : []),
+    ...(user?.role !== 'provider' ? [{ href: '/smart-deals', label: 'Smart Deals', icon: Sparkles }] : []),
+    ...(user && user.role !== 'provider' ? [{ href: '/messages-client', label: 'Messages', icon: MessageCircle }] : []),
   ].sort((a, b) => {
     if (a.label === 'Dashboard') return -1;
     if (b.label === 'Dashboard') return 1;
@@ -49,9 +42,11 @@ const AppSidebar = () => {
   const providerLinks = [
     { href: '/provider/dashboard', label: 'My Vehicles', icon: Car },
     { href: '/provider/add-vehicle', label: 'Add Vehicle', icon: PlusCircle },
+    { href: '/provider/all-vehicles', label: 'View All Vehicles', icon: List },
+    { href: '/provider/rental-requests', label: 'Rental Requests', icon: ClipboardList },
+    { href: '/provider/calendar', label: 'Calendar', icon: CalendarIcon },
+    { href: '/messages-provider', label: 'Messages', icon: MessageCircle },
   ];
-
-  const adminLinks = [{ href: '/admin/dashboard', label: 'Admin Panel', icon: ShieldCheck }];
 
   const sidebarContent = (
     <>
@@ -74,30 +69,7 @@ const AppSidebar = () => {
 
           {user?.role === 'provider' && (
             <>
-              <DropdownMenuSeparator />
-              <p className="px-4 pt-2 text-xs font-semibold text-muted-foreground">PROVIDER</p>
               {providerLinks.map((link) => (
-                <li key={link.href}>
-                  <Button
-                    variant={pathname === link.href ? 'secondary' : 'ghost'}
-                    className="w-full justify-start"
-                    asChild
-                  >
-                    <Link href={link.href}>
-                      <link.icon className="mr-2 h-4 w-4" />
-                      {link.label}
-                    </Link>
-                  </Button>
-                </li>
-              ))}
-            </>
-          )}
-
-          {user?.role === 'admin' && (
-            <>
-              <DropdownMenuSeparator />
-              <p className="px-4 pt-2 text-xs font-semibold text-muted-foreground">ADMIN</p>
-              {adminLinks.map((link) => (
                 <li key={link.href}>
                   <Button
                     variant={pathname === link.href ? 'secondary' : 'ghost'}
@@ -117,28 +89,21 @@ const AppSidebar = () => {
       </nav>
       <div className="mt-auto border-t p-4 space-y-2">
         {user ? (
-          <>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start text-left h-auto">
-                  <div className="p-2 bg-muted rounded-full">
-                    <User className="h-6 w-6" />
-                  </div>
-                  <div className="flex flex-col ml-2">
-                    <span className="font-medium text-sm">{user.name}</span>
-                    <span className="text-xs text-muted-foreground">{user.email}</span>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className='capitalize font-normal text-muted-foreground'>{user.role}</DropdownMenuLabel>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button variant="outline" className="w-full" onClick={logout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
-            </Button>
-          </>
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-left h-auto"
+            asChild
+          >
+            <Link href="/profile">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 flex-shrink-0">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex flex-col ml-2">
+                <span className="font-medium text-sm">{user.name}</span>
+                <span className="text-xs text-muted-foreground">{user.email}</span>
+              </div>
+            </Link>
+          </Button>
         ) : (
           <div className="space-y-2">
             <Button variant="outline" className="w-full" asChild>

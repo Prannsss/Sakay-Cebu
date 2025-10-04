@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Compass, Car, Bike, Truck, MapPin, Star, Search, Calendar, Clock, User } from 'lucide-react';
+import { Compass, Car, Bike, Truck, MapPin, Star, Search, Calendar, Clock, User, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -12,12 +12,21 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { ThemeToggle } from '@/components/theme-toggle';
+import useLocalStorage from '@/hooks/use-local-storage';
+import { Vehicle, User as UserType, Message, Conversation, Booking } from '@/lib/types';
+import { initialVehicles } from '@/lib/data';
+import { useAuth } from '@/hooks/use-auth';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 
 export default function VehiclesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isRentalModalOpen, setIsRentalModalOpen] = useState(false);
   const [rentalForm, setRentalForm] = useState({
     pickupDate: '',
@@ -29,71 +38,18 @@ export default function VehiclesPage() {
     notes: ''
   });
   const { toast } = useToast();
-
-  const vehicles = [
-    {
-      id: '1',
-      model: 'Toyota Vios 2023',
-      type: 'car',
-      location: 'IT Park, Cebu City',
-      price: 1500,
-      rating: 4.8,
-      reviews: 124,
-      available: true
-    },
-    {
-      id: '2',
-      model: 'Honda Click 150i',
-      type: 'motorcycle',
-      location: 'Lahug, Cebu City',
-      price: 500,
-      rating: 4.6,
-      reviews: 89,
-      available: true
-    },
-    {
-      id: '3',
-      model: 'Isuzu Elf Truck',
-      type: 'truck',
-      location: 'Mandaue City',
-      price: 3000,
-      rating: 4.7,
-      reviews: 56,
-      available: true
-    },
-    {
-      id: '4',
-      model: 'Mitsubishi Mirage',
-      type: 'car',
-      location: 'Ayala Center, Cebu City',
-      price: 1200,
-      rating: 4.5,
-      reviews: 78,
-      available: true
-    },
-    {
-      id: '5',
-      model: 'Yamaha Mio',
-      type: 'motorcycle',
-      location: 'Colon Street, Cebu City',
-      price: 400,
-      rating: 4.4,
-      reviews: 92,
-      available: false
-    },
-    {
-      id: '6',
-      model: 'Ford Ranger',
-      type: 'truck',
-      location: 'Talamban, Cebu City',
-      price: 2500,
-      rating: 4.6,
-      reviews: 43,
-      available: true
-    }
-  ];
+  const { user } = useAuth();
+  const [vehicles] = useLocalStorage<Vehicle[]>('sakay-cebu-vehicles', initialVehicles);
+  const [providers] = useLocalStorage<UserType[]>('sakay-cebu-providers', []);
+  const [conversations, setConversations] = useLocalStorage<Conversation[]>('sakay-cebu-conversations', []);
+  const [bookings, setBookings] = useLocalStorage<Booking[]>('sakay-cebu-bookings', []);
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [showMessaging, setShowMessaging] = useState(false);
 
   const filteredVehicles = vehicles.filter(vehicle => {
+    // Filter out deleted vehicles
+    if (vehicle.status === 'deleted') return false;
+    
     const matchesSearch = vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vehicle.location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesLocation = locationFilter === 'all' || vehicle.location.toLowerCase().includes(locationFilter.toLowerCase());
@@ -102,18 +58,98 @@ export default function VehiclesPage() {
     return matchesSearch && matchesLocation && matchesType;
   });
 
-  const handleRentNow = (vehicle: any) => {
+  const getProvider = (providerId: string) => {
+    return providers.find(p => p.id === providerId);
+  };
+
+  const handleVehicleClick = (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle);
+    setIsDetailModalOpen(true);
+    setShowMessaging(false);
+  };
+
+  const handleSendMessage = () => {
+    if (!user || !selectedVehicle || !currentMessage.trim()) return;
+
+    const provider = getProvider(selectedVehicle.providerId);
+    if (!provider) return;
+
+    // Find or create conversation
+    let conversation = conversations.find(c => 
+      c.vehicleId === selectedVehicle.id &&
+      c.participants.includes(user.id) &&
+      c.participants.includes(provider.id)
+    );
+
+    const newMessage: Message = {
+      id: `msg-${Date.now()}`,
+      conversationId: conversation?.id || `conv-${Date.now()}`,
+      senderId: user.id,
+      content: currentMessage,
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+
+    if (!conversation) {
+      conversation = {
+        id: newMessage.conversationId,
+        participants: [user.id, provider.id],
+        lastMessage: newMessage,
+        lastActivity: newMessage.timestamp,
+        vehicleId: selectedVehicle.id
+      };
+      setConversations([...conversations, conversation]);
+    } else {
+      const updatedConversations = conversations.map(c => 
+        c.id === conversation!.id 
+          ? { ...c, lastMessage: newMessage, lastActivity: newMessage.timestamp }
+          : c
+      );
+      setConversations(updatedConversations);
+    }
+
+    // Store message
+    const messagesKey = `sakay-cebu-messages-${conversation.id}`;
+    const existingMessages = JSON.parse(localStorage.getItem(messagesKey) || '[]');
+    localStorage.setItem(messagesKey, JSON.stringify([...existingMessages, newMessage]));
+
+    setCurrentMessage('');
+    toast({
+      title: 'Message Sent!',
+      description: 'The provider will receive your message.',
+    });
+  };
+
+  const getConversationMessages = (conversationId: string): Message[] => {
+    const messagesKey = `sakay-cebu-messages-${conversationId}`;
+    return JSON.parse(localStorage.getItem(messagesKey) || '[]');
+  };
+
+  const handleRentNow = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
     setIsRentalModalOpen(true);
+    setIsDetailModalOpen(false);
   };
 
   const handleRentalSubmit = () => {
+    if (!selectedVehicle || !user) return;
+    
     // Basic validation
     if (!rentalForm.pickupDate || !rentalForm.returnDate || !rentalForm.driverLicense || !rentalForm.phoneNumber) {
       toast({
         variant: 'destructive',
         title: 'Missing Information',
         description: 'Please fill in all required fields.',
+      });
+      return;
+    }
+
+    // Validate times
+    if (!rentalForm.pickupTime || !rentalForm.returnTime) {
+      toast({
+        variant: 'destructive',
+        title: 'Missing Information',
+        description: 'Please select pickup and return times.',
       });
       return;
     }
@@ -132,11 +168,31 @@ export default function VehiclesPage() {
       return;
     }
 
-    const totalCost = selectedVehicle.price * days;
+    const totalCost = selectedVehicle.pricePerDay * days;
+
+    // Create booking
+    const newBooking: Booking = {
+      id: `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      userId: user.id,
+      vehicleId: selectedVehicle.id,
+      startDate: rentalForm.pickupDate,
+      endDate: rentalForm.returnDate,
+      startTime: rentalForm.pickupTime,
+      endTime: rentalForm.returnTime,
+      totalPrice: totalCost,
+      status: 'pending',
+      driverLicense: rentalForm.driverLicense,
+      phone: rentalForm.phoneNumber,
+      notes: rentalForm.notes,
+      createdAt: new Date().toISOString(),
+    };
+
+    // Save to localStorage
+    setBookings([...bookings, newBooking]);
 
     toast({
       title: 'Rental Request Submitted!',
-      description: `Your rental request for ${selectedVehicle.model} has been submitted. Total cost: ₱${totalCost.toLocaleString()} for ${days} day(s). You will be contacted shortly.`,
+      description: `Your rental request for ${selectedVehicle.model} has been submitted. Total cost: ₱${totalCost.toLocaleString()} for ${days} day(s). The provider will review your request.`,
     });
 
     // Reset form and close modal
@@ -160,17 +216,14 @@ export default function VehiclesPage() {
     const returnDate = new Date(rentalForm.returnDate);
     const days = Math.ceil((returnDate.getTime() - pickup.getTime()) / (1000 * 3600 * 24));
     
-    return days > 0 ? selectedVehicle.price * days : 0;
+    return days > 0 ? selectedVehicle.pricePerDay * days : 0;
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div>
           <h1 className="text-2xl sm:text-3xl font-bold font-headline">Explore Vehicles</h1>
-          <div className="lg:hidden">
-            <ThemeToggle />
-          </div>
         </div>
         <p className="text-muted-foreground">
           Discover a wide range of vehicles available for rent in Cebu. 
@@ -212,72 +265,16 @@ export default function VehiclesPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="car">Cars</SelectItem>
-                <SelectItem value="motorcycle">Motorcycles</SelectItem>
-                <SelectItem value="truck">Trucks</SelectItem>
+                <SelectItem value="Cars">Cars</SelectItem>
+                <SelectItem value="Motorcycles">Motorcycles</SelectItem>
+                <SelectItem value="Vans">Vans</SelectItem>
+                <SelectItem value="Trucks">Trucks</SelectItem>
+                <SelectItem value="Multicab">Multicab</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
       </Card>
-
-      {/* Vehicle Type Overview */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <Card 
-          className={`text-center hover:shadow-lg transition-all cursor-pointer ${
-            typeFilter === 'car' 
-              ? 'bg-primary/10 border-primary shadow-md ring-2 ring-primary/20' 
-              : 'hover:bg-primary/5'
-          }`} 
-          onClick={() => setTypeFilter(typeFilter === 'car' ? 'all' : 'car')}
-        >
-          <CardContent className="pt-3 pb-3 sm:pt-6">
-            <Car className={`h-5 w-5 sm:h-8 sm:w-8 mx-auto mb-1 sm:mb-2 ${
-              typeFilter === 'car' ? 'text-primary' : 'text-primary'
-            }`} />
-            <CardTitle className={`text-sm sm:text-lg ${
-              typeFilter === 'car' ? 'text-primary font-bold' : ''
-            }`}>Cars</CardTitle>
-            <CardDescription className="text-xs sm:text-sm hidden sm:block">Comfortable rides for city and long trips</CardDescription>
-          </CardContent>
-        </Card>
-        <Card 
-          className={`text-center hover:shadow-lg transition-all cursor-pointer ${
-            typeFilter === 'motorcycle' 
-              ? 'bg-primary/10 border-primary shadow-md ring-2 ring-primary/20' 
-              : 'hover:bg-primary/5'
-          }`} 
-          onClick={() => setTypeFilter(typeFilter === 'motorcycle' ? 'all' : 'motorcycle')}
-        >
-          <CardContent className="pt-3 pb-3 sm:pt-6">
-            <Bike className={`h-5 w-5 sm:h-8 sm:w-8 mx-auto mb-1 sm:mb-2 ${
-              typeFilter === 'motorcycle' ? 'text-primary' : 'text-primary'
-            }`} />
-            <CardTitle className={`text-sm sm:text-lg ${
-              typeFilter === 'motorcycle' ? 'text-primary font-bold' : ''
-            }`}>Motorcycles</CardTitle>
-            <CardDescription className="text-xs sm:text-sm hidden sm:block">Quick and efficient for city navigation</CardDescription>
-          </CardContent>
-        </Card>
-        <Card 
-          className={`text-center hover:shadow-lg transition-all cursor-pointer ${
-            typeFilter === 'truck' 
-              ? 'bg-primary/10 border-primary shadow-md ring-2 ring-primary/20' 
-              : 'hover:bg-primary/5'
-          }`} 
-          onClick={() => setTypeFilter(typeFilter === 'truck' ? 'all' : 'truck')}
-        >
-          <CardContent className="pt-3 pb-3 sm:pt-6">
-            <Truck className={`h-5 w-5 sm:h-8 sm:w-8 mx-auto mb-1 sm:mb-2 ${
-              typeFilter === 'truck' ? 'text-primary' : 'text-primary'
-            }`} />
-            <CardTitle className={`text-sm sm:text-lg ${
-              typeFilter === 'truck' ? 'text-primary font-bold' : ''
-            }`}>Trucks</CardTitle>
-            <CardDescription className="text-xs sm:text-sm hidden sm:block">Heavy-duty vehicles for cargo and moving</CardDescription>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Vehicle Listings */}
       <div className="space-y-4">
@@ -316,27 +313,43 @@ export default function VehiclesPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredVehicles.map((vehicle) => {
-              const getVehicleIcon = (type: string) => {
-                switch (type) {
-                  case 'car': return Car;
-                  case 'motorcycle': return Bike;
-                  case 'truck': return Truck;
-                  default: return Car;
-                }
-              };
-              
-              const IconComponent = getVehicleIcon(vehicle.type);
+              const isBase64 = vehicle.photos[0]?.startsWith('data:image');
+              const isAvailable = !vehicle.status || vehicle.status === 'available';
+              const statusBadge = vehicle.status === 'unavailable' ? 'Unavailable' :
+                                 vehicle.status === 'maintenance' ? 'On Maintenance' : null;
               
               return (
-                <Card key={vehicle.id} className="hover:shadow-lg transition-shadow">
+                <Card 
+                  key={vehicle.id} 
+                  className={`hover:shadow-lg transition-shadow cursor-pointer ${!isAvailable ? 'opacity-75' : ''}`}
+                  onClick={() => handleVehicleClick(vehicle)}
+                >
                   <CardContent className="p-4">
-                    <div className="h-48 bg-muted rounded-lg mb-4 flex items-center justify-center">
-                      <IconComponent className="h-12 w-12 text-muted-foreground" />
+                    <div className="h-48 bg-muted rounded-lg mb-4 overflow-hidden relative">
+                      {isBase64 ? (
+                        <img 
+                          src={vehicle.photos[0]} 
+                          alt={vehicle.model}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+                          <Car className="h-12 w-12 text-primary/50" />
+                        </div>
+                      )}
+                      {statusBadge && (
+                        <Badge
+                          variant={vehicle.status === 'unavailable' ? 'destructive' : 'secondary'}
+                          className="absolute top-2 left-2"
+                        >
+                          {statusBadge}
+                        </Badge>
+                      )}
                     </div>
                     <div className="flex justify-between items-start mb-2">
                       <CardTitle className="text-lg">{vehicle.model}</CardTitle>
-                      {!vehicle.available && (
-                        <Badge variant="secondary">Not Available</Badge>
+                      {vehicle.verified && (
+                        <Badge variant="default" className="bg-green-500">Verified</Badge>
                       )}
                     </div>
                     <div className="flex items-center text-sm text-muted-foreground mb-2">
@@ -344,17 +357,19 @@ export default function VehiclesPage() {
                       {vehicle.location}
                     </div>
                     <div className="flex items-center mb-3">
-                      <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                      <span className="text-sm">{vehicle.rating} ({vehicle.reviews} reviews)</span>
+                      <Badge variant="secondary">{vehicle.type}</Badge>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="font-bold text-lg">₱{vehicle.price.toLocaleString()}/day</span>
+                      <span className="font-bold text-lg">₱{vehicle.pricePerDay.toLocaleString()}/day</span>
                       <Button 
-                        size="sm" 
-                        disabled={!vehicle.available}
-                        onClick={() => vehicle.available && handleRentNow(vehicle)}
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRentNow(vehicle);
+                        }}
+                        disabled={!isAvailable}
                       >
-                        {vehicle.available ? 'Rent Now' : 'Unavailable'}
+                        {isAvailable ? 'Rent Now' : 'Unavailable'}
                       </Button>
                     </div>
                   </CardContent>
@@ -364,6 +379,200 @@ export default function VehiclesPage() {
           </div>
         )}
       </div>
+
+      {/* Vehicle Detail Modal */}
+      <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
+        <DialogContent className="sm:max-w-[800px] w-[95vw] max-h-[90vh] overflow-y-auto mx-auto">
+          {selectedVehicle && (
+            <div className="space-y-6">
+              <DialogHeader>
+                <DialogTitle>{selectedVehicle.model}</DialogTitle>
+                <DialogDescription>
+                  View details and message the provider
+                </DialogDescription>
+              </DialogHeader>
+              {/* Photo Carousel */}
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {selectedVehicle.photos.map((photo, index) => {
+                    const isBase64 = photo.startsWith('data:image');
+                    return (
+                      <CarouselItem key={index}>
+                        <div className="h-[300px] sm:h-[400px] bg-muted rounded-lg overflow-hidden">
+                          {isBase64 ? (
+                            <img 
+                              src={photo} 
+                              alt={`${selectedVehicle.model} - Photo ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+                              <Car className="h-24 w-24 text-primary/50" />
+                            </div>
+                          )}
+                        </div>
+                      </CarouselItem>
+                    );
+                  })}
+                </CarouselContent>
+                {selectedVehicle.photos.length > 1 && (
+                  <>
+                    <CarouselPrevious className="left-2" />
+                    <CarouselNext className="right-2" />
+                  </>
+                )}
+              </Carousel>
+
+              {/* Vehicle Details */}
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h2 className="text-2xl font-bold">{selectedVehicle.model}</h2>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="secondary">{selectedVehicle.type}</Badge>
+                        {selectedVehicle.verified && (
+                          <Badge variant="default" className="bg-green-500">Verified</Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-3xl font-bold text-primary">₱{selectedVehicle.pricePerDay.toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground">per day</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center text-muted-foreground mt-2">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    <span>{selectedVehicle.location}</span>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Description */}
+                <div>
+                  <h3 className="font-semibold mb-2">Description</h3>
+                  <p className="text-muted-foreground">{selectedVehicle.description}</p>
+                </div>
+
+                <Separator />
+
+                {/* Provider Info */}
+                {(() => {
+                  const provider = getProvider(selectedVehicle.providerId);
+                  return provider ? (
+                    <div>
+                      <h3 className="font-semibold mb-3">Provider Information</h3>
+                      <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-12 w-12">
+                            <AvatarImage src={localStorage.getItem(`sakay-cebu-profile-pic-provider-${provider.id}`) || undefined} />
+                            <AvatarFallback className="bg-primary text-primary-foreground">
+                              {provider.name.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-semibold">{provider.name}</p>
+                            <p className="text-sm text-muted-foreground">{provider.email}</p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowMessaging(!showMessaging)}
+                          disabled={!user}
+                        >
+                          <MessageCircle className="h-4 w-4 mr-2" />
+                          {showMessaging ? 'Hide Chat' : 'Message'}
+                        </Button>
+                      </div>
+
+                      {/* Messaging Section */}
+                      {showMessaging && user && (
+                        <div className="mt-4 border rounded-lg">
+                          <div className="p-3 bg-muted/50 border-b">
+                            <h4 className="font-semibold text-sm">Chat with Provider</h4>
+                          </div>
+                          <ScrollArea className="h-[200px] p-4">
+                            {(() => {
+                              const conversation = conversations.find(c => 
+                                c.vehicleId === selectedVehicle.id &&
+                                c.participants.includes(user.id) &&
+                                c.participants.includes(provider.id)
+                              );
+                              const messages = conversation ? getConversationMessages(conversation.id) : [];
+                              
+                              return messages.length > 0 ? (
+                                <div className="space-y-3">
+                                  {messages.map((msg) => (
+                                    <div 
+                                      key={msg.id}
+                                      className={`flex ${msg.senderId === user.id ? 'justify-end' : 'justify-start'}`}
+                                    >
+                                      <div className={`max-w-[70%] rounded-lg p-3 ${
+                                        msg.senderId === user.id 
+                                          ? 'bg-primary text-primary-foreground' 
+                                          : 'bg-muted'
+                                      }`}>
+                                        <p className="text-sm">{msg.content}</p>
+                                        <p className={`text-xs mt-1 ${
+                                          msg.senderId === user.id 
+                                            ? 'text-primary-foreground/70' 
+                                            : 'text-muted-foreground'
+                                        }`}>
+                                          {new Date(msg.timestamp).toLocaleTimeString()}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+                                  No messages yet. Start the conversation!
+                                </div>
+                              );
+                            })()}
+                          </ScrollArea>
+                          <div className="p-3 border-t flex gap-2">
+                            <Input
+                              placeholder="Type your message..."
+                              value={currentMessage}
+                              onChange={(e) => setCurrentMessage(e.target.value)}
+                              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                            />
+                            <Button onClick={handleSendMessage} disabled={!currentMessage.trim()}>
+                              Send
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-muted-foreground text-sm">Provider information not available</div>
+                  );
+                })()}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <Button 
+                  className="flex-1"
+                  onClick={() => handleRentNow(selectedVehicle)}
+                >
+                  Rent This Vehicle
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => setIsDetailModalOpen(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Rental Modal */}
       <Dialog open={isRentalModalOpen} onOpenChange={setIsRentalModalOpen}>
@@ -389,11 +598,8 @@ export default function VehiclesPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold">₱{selectedVehicle.price.toLocaleString()}/day</p>
-                      <p className="text-sm text-muted-foreground flex items-center">
-                        <Star className="h-3 w-3 mr-1 text-yellow-400" />
-                        {selectedVehicle.rating} ({selectedVehicle.reviews})
-                      </p>
+                      <p className="font-bold">₱{selectedVehicle.pricePerDay.toLocaleString()}/day</p>
+                      <Badge variant="secondary" className="mt-1">{selectedVehicle.type}</Badge>
                     </div>
                   </div>
                 </CardContent>
@@ -513,7 +719,7 @@ export default function VehiclesPage() {
                       <div>
                         <p className="font-semibold">Total Rental Cost</p>
                         <p className="text-sm text-muted-foreground">
-                          {Math.ceil((new Date(rentalForm.returnDate).getTime() - new Date(rentalForm.pickupDate).getTime()) / (1000 * 3600 * 24))} day(s) @ ₱{selectedVehicle.price.toLocaleString()}/day
+                          {Math.ceil((new Date(rentalForm.returnDate).getTime() - new Date(rentalForm.pickupDate).getTime()) / (1000 * 3600 * 24))} day(s) @ ₱{selectedVehicle.pricePerDay.toLocaleString()}/day
                         </p>
                       </div>
                       <p className="text-2xl font-bold text-primary">₱{calculateTotal().toLocaleString()}</p>

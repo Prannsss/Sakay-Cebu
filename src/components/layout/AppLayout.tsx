@@ -29,11 +29,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {/* Main Content */}
           <main className="flex-1 flex flex-col">
             {/* Page Content */}
-            <div className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
-              {/* Desktop Theme Toggle */}
-              <div className='hidden lg:flex justify-end mb-6'>
-                <ThemeToggle />
-              </div>
+            <div className="flex-1 pb-20 lg:pb-8">
               {children}
             </div>
           </main>

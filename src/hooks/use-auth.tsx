@@ -12,6 +12,7 @@ interface AuthContextType {
   login: (email: string, password: string) => boolean;
   signup: (name: string, email: string, password: string, role: 'user' | 'provider') => boolean;
   logout: () => void;
+  updateUser: (updatedUser: User) => void;
   users: User[];
   providers: Provider[];
   setUsers: (users: User[]) => void;
@@ -31,9 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const foundUser = allUsers.find(u => u.email === email && u.password === password);
     if (foundUser) {
       setUser(foundUser);
-      if (foundUser.role === 'admin') {
-        router.push('/admin/dashboard');
-      } else if (foundUser.role === 'provider') {
+      if (foundUser.role === 'provider') {
         router.push('/provider/dashboard');
       } else {
         router.push('/dashboard');
@@ -77,7 +76,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.replace('/login');
   };
 
-  const value = { user, login, signup, logout, users, providers, setUsers, setProviders };
+  const updateUser = (updatedUser: User) => {
+    // Update the current user in auth context
+    setUser(updatedUser);
+    
+    // Update the user in the appropriate list
+    if (updatedUser.role === 'provider') {
+      const updatedProviders = providers.map(p => 
+        p.id === updatedUser.id ? updatedUser as Provider : p
+      );
+      setProviders(updatedProviders);
+    } else {
+      const updatedUsers = users.map(u => 
+        u.id === updatedUser.id ? updatedUser : u
+      );
+      setUsers(updatedUsers);
+    }
+  };
+
+  const value = { user, login, signup, logout, updateUser, users, providers, setUsers, setProviders };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -1,86 +1,15 @@
 import type { User, Provider, Vehicle } from './types';
 
 export const initialUsers: User[] = [
-  { id: 'user-1', name: 'John Doe', email: 'john@example.com', password: 'password', role: 'user' },
   { id: 'admin-1', name: 'Admin User', email: 'admin@example.com', password: 'adminpass', role: 'admin' },
 ];
 
-export const initialProviders: Provider[] = [
-  { id: 'provider-1', name: 'Cebu Car Rentals', email: 'provider@cebu.com', password: 'providerpass', role: 'provider', verified: true },
-  { id: 'provider-2', name: 'Mactan Scooters', email: 'provider@mactan.com', password: 'providerpass', role: 'provider', verified: false },
-];
+export const initialProviders: Provider[] = [];
 
-export const initialVehicles: Vehicle[] = [
-  {
-    id: 'vehicle-1',
-    providerId: 'provider-1',
-    model: 'Toyota Vios',
-    type: 'Sedan',
-    location: 'Cebu City',
-    pricePerDay: 1500,
-    photos: ['sedan-1'],
-    availability: [{ from: '2024-01-01', to: '2024-12-31' }],
-    description: 'A reliable and fuel-efficient sedan for city driving.',
-    verified: true,
-  },
-  {
-    id: 'vehicle-2',
-    providerId: 'provider-1',
-    model: 'Toyota Fortuner',
-    type: 'SUV',
-    location: 'Mandaue City',
-    pricePerDay: 3000,
-    photos: ['suv-1'],
-    availability: [{ from: '2024-01-01', to: '2024-12-31' }],
-    description: 'A spacious and powerful SUV for family trips and adventures.',
-    verified: true,
-  },
-  {
-    id: 'vehicle-3',
-    providerId: 'provider-2',
-    model: 'Honda Click 125i',
-    type: 'Motorcycle',
-    location: 'Lapu-Lapu City',
-    pricePerDay: 500,
-    photos: ['motorcycle-1'],
-    availability: [{ from: '2024-01-01', to: '2024-12-31' }],
-    description: 'A nimble and efficient scooter for navigating through traffic.',
-    verified: true,
-  },
-  {
-    id: 'vehicle-4',
-    providerId: 'provider-1',
-    model: 'Nissan Urvan',
-    type: 'Van',
-    location: 'Cebu City',
-    pricePerDay: 2500,
-    photos: ['van-1'],
-    availability: [{ from: '2024-01-01', to: '2024-12-31' }],
-    description: 'A large van perfect for group tours and outings.',
-    verified: true,
-  },
-    {
-    id: 'vehicle-5',
-    providerId: 'provider-1',
-    model: 'Mitsubishi Mirage',
-    type: 'Sedan',
-    location: 'Talisay City',
-    pricePerDay: 1300,
-    photos: ['sedan-2'],
-    availability: [{ from: '2024-01-01', to: '2024-12-31' }],
-    description: 'A compact and economical choice for solo travelers or couples.',
-    verified: true,
-  },
-  {
-    id: 'vehicle-6',
-    providerId: 'provider-2',
-    model: 'NMAX 155',
-    type: 'Motorcycle',
-    location: 'Lapu-Lapu City',
-    pricePerDay: 700,
-    photos: ['motorcycle-2'],
-    availability: [{ from: '2024-01-01', to: '2024-12-31' }],
-    description: 'A premium scooter with great performance and comfort.',
-    verified: false,
-  },
+export const initialVehicles: Vehicle[] = [];
+
+// Combined users array for messaging system
+export const allUsers: User[] = [
+  ...initialUsers,
+  ...initialProviders,
 ];

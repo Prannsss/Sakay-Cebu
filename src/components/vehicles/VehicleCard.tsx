@@ -14,13 +14,20 @@ interface VehicleCardProps {
 
 const VehicleCard = ({ vehicle }: VehicleCardProps) => {
   const image = PlaceHolderImages.find(img => img.id === vehicle.photos[0]);
+  const isBase64 = vehicle.photos[0]?.startsWith('data:image');
 
   return (
     <Card className="group flex h-full flex-col overflow-hidden transition-shadow duration-300 hover:shadow-xl">
       <CardHeader className="p-0">
         <Link href={`/vehicles/${vehicle.id}`} className="block">
-          <div className="aspect-video overflow-hidden">
-            {image && (
+          <div className="aspect-video overflow-hidden bg-muted">
+            {isBase64 ? (
+              <img
+                src={vehicle.photos[0]}
+                alt={vehicle.model}
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            ) : image ? (
               <Image
                 src={image.imageUrl}
                 alt={vehicle.model}
@@ -29,6 +36,10 @@ const VehicleCard = ({ vehicle }: VehicleCardProps) => {
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 data-ai-hint={image.imageHint}
               />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center">
+                <span className="text-muted-foreground">No image</span>
+              </div>
             )}
           </div>
         </Link>
