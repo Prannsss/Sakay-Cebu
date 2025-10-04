@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Compass, Car, Bike, Truck, MapPin, Star, Search, Calendar, Clock, User, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Compass, Car, Bike, Truck, MapPin, Star, Search, Calendar, Clock, User, MessageCircle, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
@@ -23,7 +24,6 @@ import { Separator } from '@/components/ui/separator';
 
 export default function VehiclesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [locationFilter, setLocationFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -52,10 +52,9 @@ export default function VehiclesPage() {
     
     const matchesSearch = vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vehicle.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLocation = locationFilter === 'all' || vehicle.location.toLowerCase().includes(locationFilter.toLowerCase());
     const matchesType = typeFilter === 'all' || vehicle.type === typeFilter;
     
-    return matchesSearch && matchesLocation && matchesType;
+    return matchesSearch && matchesType;
   });
 
   const getProvider = (providerId: string) => {
@@ -233,9 +232,9 @@ export default function VehiclesPage() {
 
       {/* Search and Filter Section */}
       <Card className="p-4 sm:p-6">
-        <div className="space-y-4">
-          {/* Search Bar - Full width on mobile */}
-          <div className="relative">
+        <div className="flex gap-2">
+          {/* Search Bar with Filter Icon */}
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search vehicles or locations..."
@@ -245,34 +244,61 @@ export default function VehiclesPage() {
             />
           </div>
           
-          {/* Filter Dropdowns - Stack on mobile */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
-            <Select value={locationFilter} onValueChange={setLocationFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Location" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Locations</SelectItem>
-                <SelectItem value="cebu city">Cebu City</SelectItem>
-                <SelectItem value="mandaue">Mandaue City</SelectItem>
-                <SelectItem value="lapu-lapu">Lapu-Lapu City</SelectItem>
-                <SelectItem value="talisay">Talisay City</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Vehicle Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="Cars">Cars</SelectItem>
-                <SelectItem value="Motorcycles">Motorcycles</SelectItem>
-                <SelectItem value="Vans">Vans</SelectItem>
-                <SelectItem value="Trucks">Trucks</SelectItem>
-                <SelectItem value="Multicab">Multicab</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Filter Icon Button */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon" className="shrink-0">
+                <Filter className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-3" align="end">
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm mb-3">Filter by Type</h4>
+                <Button
+                  variant={typeFilter === 'all' ? 'default' : 'ghost'}
+                  className="w-full justify-start"
+                  onClick={() => setTypeFilter('all')}
+                >
+                  All Types
+                </Button>
+                <Button
+                  variant={typeFilter === 'Cars' ? 'default' : 'ghost'}
+                  className="w-full justify-start"
+                  onClick={() => setTypeFilter('Cars')}
+                >
+                  Cars
+                </Button>
+                <Button
+                  variant={typeFilter === 'Motorcycles' ? 'default' : 'ghost'}
+                  className="w-full justify-start"
+                  onClick={() => setTypeFilter('Motorcycles')}
+                >
+                  Motorcycles
+                </Button>
+                <Button
+                  variant={typeFilter === 'Vans' ? 'default' : 'ghost'}
+                  className="w-full justify-start"
+                  onClick={() => setTypeFilter('Vans')}
+                >
+                  Vans
+                </Button>
+                <Button
+                  variant={typeFilter === 'Trucks' ? 'default' : 'ghost'}
+                  className="w-full justify-start"
+                  onClick={() => setTypeFilter('Trucks')}
+                >
+                  Trucks
+                </Button>
+                <Button
+                  variant={typeFilter === 'Multicab' ? 'default' : 'ghost'}
+                  className="w-full justify-start"
+                  onClick={() => setTypeFilter('Multicab')}
+                >
+                  Multicab
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </Card>
 
@@ -282,12 +308,11 @@ export default function VehiclesPage() {
           <h2 className="text-2xl font-semibold">
             Available Vehicles ({filteredVehicles.length})
           </h2>
-          {(searchTerm || locationFilter !== 'all' || typeFilter !== 'all') && (
+          {(searchTerm || typeFilter !== 'all') && (
             <Button 
               variant="outline" 
               onClick={() => {
                 setSearchTerm('');
-                setLocationFilter('all');
                 setTypeFilter('all');
               }}
             >
@@ -303,7 +328,6 @@ export default function VehiclesPage() {
               variant="outline" 
               onClick={() => {
                 setSearchTerm('');
-                setLocationFilter('all');
                 setTypeFilter('all');
               }}
             >

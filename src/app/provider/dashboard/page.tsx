@@ -6,12 +6,13 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Loader2, PlusCircle, Car, Eye, Calendar, TrendingUp, DollarSign } from 'lucide-react';
+import { Loader2, PlusCircle, Car, Eye, Calendar, TrendingUp, DollarSign, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { Vehicle, Booking } from '@/lib/types';
 import { initialVehicles } from '@/lib/data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 export default function ProviderDashboardPage() {
   const { user } = useAuth();
@@ -19,6 +20,8 @@ export default function ProviderDashboardPage() {
   const [vehicles] = useLocalStorage<Vehicle[]>('sakay-cebu-vehicles', initialVehicles);
   const [bookings] = useLocalStorage<Booking[]>('sakay-cebu-bookings', []);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentBookingPage, setCurrentBookingPage] = useState(0);
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   useEffect(() => {
     if (user === undefined) return;
@@ -53,6 +56,23 @@ export default function ProviderDashboardPage() {
   
   const totalViews = providerVehicles.length * 150; // Mock views data
   const verifiedVehicles = providerVehicles.filter(vehicle => vehicle.verified).length;
+
+  // Pie chart data: Rentals by vehicle type
+  const rentalsByType = providerBookings.reduce((acc, booking) => {
+    const vehicle = vehicles.find(v => v.id === booking.vehicleId);
+    if (vehicle) {
+      const type = vehicle.type;
+      acc[type] = (acc[type] || 0) + 1;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+
+  const pieChartData = Object.entries(rentalsByType).map(([type, count]) => ({
+    name: type,
+    value: count
+  }));
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
   return (
     <div className="fixed inset-0 left-0 top-0 bottom-0 lg:left-64 bg-background overflow-auto">
@@ -89,7 +109,17 @@ export default function ProviderDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <Button 
+              onClick={() => setShowAnalytics(!showAnalytics)}
+              className="bg-orange-500 hover:bg-orange-600 text-white h-8 w-8 p-0"
+              size="icon"
+            >
+              {showAnalytics ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="text-xl lg:text-2xl font-bold">₱{totalEarnings.toLocaleString()}</div>
@@ -131,12 +161,75 @@ export default function ProviderDashboardPage() {
         </Card>
       </div>
 
-      {/* Recent Bookings - Shows second on mobile */}
-      {providerBookings.length > 0 && (
-        <Card className="order-2 lg:order-2">
+      {/* Analytics - Pie Chart (Collapsible) - Shows above Recent Bookings when visible */}
+      {showAnalytics && (
+      <div className="order-2 lg:order-2">
+        <Card>
           <CardHeader>
-            <CardTitle>Recent Bookings</CardTitle>
-            <CardDescription>Latest rental requests and active bookings</CardDescription>
+            <CardTitle>Rental Analytics</CardTitle>
+            <CardDescription>Distribution of rentals across different vehicle categories</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {pieChartData.length > 0 ? (
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {pieChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <TrendingUp className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">No rental data available yet</p>
+                <p className="text-sm text-muted-foreground mt-2">Analytics will appear once you receive bookings</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+      )}
+
+      {/* Recent Bookings - Shows after analytics (if shown) */}
+      {providerBookings.length > 0 && (
+        <Card className="order-3 lg:order-3">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Recent Bookings</CardTitle>
+              <CardDescription>Latest rental requests and active bookings</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setCurrentBookingPage(prev => Math.max(0, prev - 1))}
+                disabled={currentBookingPage === 0}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setCurrentBookingPage(prev => Math.min(Math.floor(providerBookings.length / 5), prev + 1))}
+                disabled={currentBookingPage >= Math.floor(providerBookings.length / 5)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -151,28 +244,30 @@ export default function ProviderDashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {providerBookings.slice(0, 5).map(booking => {
-                    const vehicle = vehicles.find(v => v.id === booking.vehicleId);
-                    return (
-                      <TableRow key={booking.id}>
-                        <TableCell className="font-medium">{vehicle?.model || 'Unknown'}</TableCell>
-                        <TableCell>Customer #{booking.userId.slice(-4)}</TableCell>
-                        <TableCell className="text-sm">
-                          {new Date(booking.startDate).toLocaleDateString()} - {new Date(booking.endDate).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>₱{booking.totalPrice.toLocaleString()}</TableCell>
-                        <TableCell>
-                          <Badge variant={
-                            booking.status === 'completed' ? 'default' :
-                            booking.status === 'active' ? 'success' :
-                            'destructive'
-                          }>
-                            {booking.status}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  {providerBookings
+                    .slice(currentBookingPage * 5, (currentBookingPage * 5) + 5)
+                    .map(booking => {
+                      const vehicle = vehicles.find(v => v.id === booking.vehicleId);
+                      return (
+                        <TableRow key={booking.id}>
+                          <TableCell className="font-medium">{vehicle?.model || 'Unknown'}</TableCell>
+                          <TableCell>Customer #{booking.userId.slice(-4)}</TableCell>
+                          <TableCell className="text-sm">
+                            {new Date(booking.startDate).toLocaleDateString()} - {new Date(booking.endDate).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>₱{booking.totalPrice.toLocaleString()}</TableCell>
+                          <TableCell>
+                            <Badge variant={
+                              booking.status === 'completed' ? 'default' :
+                              booking.status === 'active' ? 'success' :
+                              'destructive'
+                            }>
+                              {booking.status}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                 </TableBody>
               </Table>
             </div>
@@ -180,9 +275,9 @@ export default function ProviderDashboardPage() {
         </Card>
       )}
 
-      {/* Vehicles Management - Shows third on mobile */}
+      {/* Vehicles Management - Shows after Recent Bookings */}
       {providerVehicles.length > 0 ? (
-        <Card className="order-3 lg:order-3">
+        <Card className="order-4 lg:order-4">
           <CardHeader>
             <CardTitle>My Vehicles</CardTitle>
             <CardDescription>Manage your vehicle listings and performance</CardDescription>
@@ -219,7 +314,7 @@ export default function ProviderDashboardPage() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="flex flex-col items-center justify-center py-16 text-center order-3 lg:order-3">
+        <Card className="flex flex-col items-center justify-center py-16 text-center order-4 lg:order-4">
           <CardHeader>
             <Car className="mx-auto h-12 w-12 text-muted-foreground" />
             <CardTitle>No Vehicles Listed</CardTitle>
@@ -233,19 +328,6 @@ export default function ProviderDashboardPage() {
         </Card>
       )}
 
-      {/* Quick Actions - Only Analytics now */}
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 order-4 lg:order-4">
-        <Card className="border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
-          <CardContent className="flex flex-col items-center justify-center py-8">
-            <TrendingUp className="h-8 w-8 text-muted-foreground mb-2" />
-            <CardTitle className="text-lg mb-2">Analytics</CardTitle>
-            <CardDescription className="text-center mb-4">View detailed performance metrics</CardDescription>
-            <Button variant="outline" disabled>
-              Coming Soon
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
       </div>
       </div>
     </div>

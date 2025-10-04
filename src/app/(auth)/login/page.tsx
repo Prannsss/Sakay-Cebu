@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Zap } from 'lucide-react';
 
 import LoginForm from '@/components/auth/LoginForm';
 import SignUpForm from '@/components/auth/SignUpForm';
@@ -30,7 +31,7 @@ const AuthPage = () => {
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
           <div className='flex flex-col items-center gap-4'>
-            <Logo />
+            <Zap className="h-16 w-16" />
             <span className="text-2xl font-bold font-headline">Sakay Cebu</span>
           </div>
         </motion.div>

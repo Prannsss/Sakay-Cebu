@@ -27,12 +27,12 @@ const VehicleFilters = ({ onFilterChange }: VehicleFiltersProps) => {
             <CardTitle>Find Your Perfect Ride</CardTitle>
         </CardHeader>
         <CardContent>
-            <form onSubmit={handleSearch} className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4 items-end">
-                <div className="md:col-span-1 lg:col-span-2">
-                    <label htmlFor="location" className="block text-sm font-medium text-muted-foreground mb-1">Location</label>
-                    <Input id="location" placeholder="e.g., Cebu City, Mactan" value={location} onChange={(e) => setLocation(e.target.value)} />
+            <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4 items-end">
+                <div className="flex-1">
+                    <label htmlFor="location" className="block text-sm font-medium text-muted-foreground mb-1">Search</label>
+                    <Input id="location" placeholder="Search by model or location..." value={location} onChange={(e) => setLocation(e.target.value)} />
                 </div>
-                <div>
+                <div className="w-full md:w-48">
                     <label htmlFor="type" className="block text-sm font-medium text-muted-foreground mb-1">Vehicle Type</label>
                     <Select value={type} onValueChange={setType}>
                         <SelectTrigger id="type">
@@ -48,9 +48,9 @@ const VehicleFilters = ({ onFilterChange }: VehicleFiltersProps) => {
                         </SelectContent>
                     </Select>
                 </div>
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full md:w-auto">
                     <Search className="mr-2 h-4 w-4" />
-                    Search Vehicles
+                    Search
                 </Button>
             </form>
         </CardContent>
