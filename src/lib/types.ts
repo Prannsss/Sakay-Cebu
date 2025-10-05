@@ -3,7 +3,7 @@ export interface User {
   email: string;
   phone?: string;
   password?: string; // In a real app, this would be hashed
-  role: 'user' | 'provider' | 'admin';
+  role: 'user' | 'provider';
   name: string;
 }
 
@@ -24,6 +24,12 @@ export interface Vehicle {
   description: string;
   verified: boolean;
   status?: 'available' | 'unavailable' | 'maintenance' | 'deleted';
+  // Extended fields
+  yearModel?: number;
+  mileage?: number;
+  fuelType?: 'Gasoline' | 'Unleaded' | 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid';
+  transmission?: 'Automatic' | 'Manual';
+  seatingCapacity?: number;
 }
 
 export interface Booking {
@@ -43,6 +49,19 @@ export interface Booking {
   approvedAt?: string;
   pickedUpAt?: string;
   returnedAt?: string;
+}
+
+export interface Rental {
+  rentalId: string;
+  vehicleId: string;
+  clientId: string;
+  startDate: string;
+  endDate: string;
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Ongoing' | 'Completed';
+  totalPrice?: number;
+  createdAt: string;
+  updatedAt?: string;
+  notes?: string;
 }
 
 export interface VehicleFilterState {

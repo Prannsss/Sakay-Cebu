@@ -1,0 +1,126 @@
+{
+  "province": "Cebu",
+  "locations": [
+    { "municipality": "Cebu City", "barangay": "Lahug" },
+    { "municipality": "Cebu City", "barangay": "Talamban" },
+    { "municipality": "Cebu City", "barangay": "Banilad" },
+    { "municipality": "Cebu City", "barangay": "Guadalupe" },
+    { "municipality": "Cebu City", "barangay": "Mabolo" },
+    { "municipality": "Cebu City", "barangay": "Capitol Site" },
+    { "municipality": "Cebu City", "barangay": "Apas" },
+    { "municipality": "Cebu City", "barangay": "Kamputhaw" },
+    { "municipality": "Cebu City", "barangay": "Pardo" },
+    { "municipality": "Cebu City", "barangay": "Basak" },
+    { "municipality": "Cebu City", "barangay": "Tisa" },
+    { "municipality": "Cebu City", "barangay": "Busay" },
+    { "municipality": "Cebu City", "barangay": "Kasambagan" },
+    { "municipality": "Cebu City", "barangay": "Pit-os" },
+    
+    { "municipality": "Mandaue City", "barangay": "Basak" },
+    { "municipality": "Mandaue City", "barangay": "Centro" },
+    { "municipality": "Mandaue City", "barangay": "Alang-alang" },
+    { "municipality": "Mandaue City", "barangay": "Guizo" },
+    { "municipality": "Mandaue City", "barangay": "Mantuyong" },
+    { "municipality": "Mandaue City", "barangay": "Tabok" },
+    { "municipality": "Mandaue City", "barangay": "Subangdaku" },
+    { "municipality": "Mandaue City", "barangay": "Casuntingan" },
+    
+    { "municipality": "Lapu-Lapu City", "barangay": "Mactan" },
+    { "municipality": "Lapu-Lapu City", "barangay": "Basak" },
+    { "municipality": "Lapu-Lapu City", "barangay": "Maribago" },
+    { "municipality": "Lapu-Lapu City", "barangay": "Pajo" },
+    { "municipality": "Lapu-Lapu City", "barangay": "Pusok" },
+    { "municipality": "Lapu-Lapu City", "barangay": "Agus" },
+    { "municipality": "Lapu-Lapu City", "barangay": "Gun-ob" },
+    
+    { "municipality": "Talisay City", "barangay": "Poblacion" },
+    { "municipality": "Talisay City", "barangay": "San Roque" },
+    { "municipality": "Talisay City", "barangay": "Lawaan II" },
+    { "municipality": "Talisay City", "barangay": "Tabunok" },
+    { "municipality": "Talisay City", "barangay": "Bulacao" },
+    { "municipality": "Talisay City", "barangay": "Pooc" },
+    
+    { "municipality": "Naga City", "barangay": "Poblacion" },
+    { "municipality": "Naga City", "barangay": "South Poblacion" },
+    { "municipality": "Naga City", "barangay": "Tinaan" },
+    { "municipality": "Naga City", "barangay": "Colon" },
+    
+    { "municipality": "Carcar City", "barangay": "Poblacion I" },
+    { "municipality": "Carcar City", "barangay": "Poblacion II" },
+    { "municipality": "Carcar City", "barangay": "Poblacion III" },
+    { "municipality": "Carcar City", "barangay": "Bolinawan" },
+    { "municipality": "Carcar City", "barangay": "Perrelos" },
+    
+    { "municipality": "Danao City", "barangay": "Poblacion" },
+    { "municipality": "Danao City", "barangay": "Suba" },
+    { "municipality": "Danao City", "barangay": "Dunggoan" },
+    { "municipality": "Danao City", "barangay": "Cogon" },
+    
+    { "municipality": "Toledo City", "barangay": "Poblacion" },
+    { "municipality": "Toledo City", "barangay": "Bato" },
+    { "municipality": "Toledo City", "barangay": "Carmen" },
+    { "municipality": "Toledo City", "barangay": "Sangi" },
+    
+    { "municipality": "Minglanilla", "barangay": "Poblacion" },
+    { "municipality": "Minglanilla", "barangay": "Tunghaan" },
+    { "municipality": "Minglanilla", "barangay": "Tungkop" },
+    { "municipality": "Minglanilla", "barangay": "Cadulawan" },
+    
+    { "municipality": "Consolacion", "barangay": "Poblacion" },
+    { "municipality": "Consolacion", "barangay": "Panas" },
+    { "municipality": "Consolacion", "barangay": "Lamac" },
+    { "municipality": "Consolacion", "barangay": "Tayud" },
+    
+    { "municipality": "Liloan", "barangay": "Poblacion" },
+    { "municipality": "Liloan", "barangay": "Yati" },
+    { "municipality": "Liloan", "barangay": "Catarman" },
+    { "municipality": "Liloan", "barangay": "San Vicente" },
+    
+    { "municipality": "Compostela", "barangay": "Poblacion" },
+    { "municipality": "Compostela", "barangay": "Canamucan" },
+    { "municipality": "Compostela", "barangay": "Tamiao" },
+    
+    { "municipality": "Cordova", "barangay": "Poblacion" },
+    { "municipality": "Cordova", "barangay": "Gabi" },
+    { "municipality": "Cordova", "barangay": "Gilutongan" },
+    
+    { "municipality": "Argao", "barangay": "Poblacion" },
+    { "municipality": "Argao", "barangay": "Langtad" },
+    { "municipality": "Argao", "barangay": "Talaga" },
+    { "municipality": "Argao", "barangay": "Binlod" },
+    
+    { "municipality": "Dalaguete", "barangay": "Poblacion" },
+    { "municipality": "Dalaguete", "barangay": "Manlapay" },
+    { "municipality": "Dalaguete", "barangay": "Obong" },
+    
+    { "municipality": "Badian", "barangay": "Poblacion" },
+    { "municipality": "Badian", "barangay": "Alawijao" },
+    { "municipality": "Badian", "barangay": "Lambug" },
+    
+    { "municipality": "Moalboal", "barangay": "Poblacion" },
+    { "municipality": "Moalboal", "barangay": "Panagsama" },
+    { "municipality": "Moalboal", "barangay": "Saavedra" },
+    
+    { "municipality": "Alcoy", "barangay": "Poblacion" },
+    { "municipality": "Alcoy", "barangay": "Pugalo" },
+    
+    { "municipality": "Barili", "barangay": "Poblacion" },
+    { "municipality": "Barili", "barangay": "Mantayupan" },
+    
+    { "municipality": "San Fernando", "barangay": "Poblacion" },
+    { "municipality": "San Fernando", "barangay": "Greenhills" },
+    { "municipality": "San Fernando", "barangay": "Balud" },
+    
+    { "municipality": "Sibonga", "barangay": "Poblacion" },
+    { "municipality": "Sibonga", "barangay": "Papan" },
+    
+    { "municipality": "Oslob", "barangay": "Poblacion" },
+    { "municipality": "Oslob", "barangay": "Tan-awan" },
+    
+    { "municipality": "Boljoon", "barangay": "Poblacion" },
+    { "municipality": "Boljoon", "barangay": "Granada" },
+    
+    { "municipality": "Santander", "barangay": "Poblacion" },
+    { "municipality": "Santander", "barangay": "Liloan" }
+  ]
+}

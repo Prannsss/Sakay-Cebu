@@ -9,8 +9,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
-import { Loader2, Calendar, MapPin, Clock, X, CheckCircle, XCircle, Hourglass, Car } from 'lucide-react';
+import { Car, MapPin, Calendar, CheckCircle, Clock, XCircle, X, CalendarPlus, Send } from 'lucide-react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { Booking, Vehicle, User, Provider, Message, Conversation } from '@/lib/types';
 import { initialVehicles } from '@/lib/data';
@@ -28,6 +32,12 @@ export default function DashboardPage() {
   const [providers] = useLocalStorage<Provider[]>('sakay-cebu-providers', []);
   const [conversations, setConversations] = useLocalStorage<Conversation[]>('sakay-cebu-conversations', []);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isExtensionModalOpen, setIsExtensionModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [extensionForm, setExtensionForm] = useState({
+    extendToDate: '',
+    reason: '',
+  });
 
   const allUsers = [...users, ...providers];
 
@@ -100,10 +110,112 @@ export default function DashboardPage() {
     });
   };
 
+  const handleRequestExtension = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setExtensionForm({
+      extendToDate: '',
+      reason: '',
+    });
+    setIsExtensionModalOpen(true);
+  };
+
+  const handleSubmitExtension = () => {
+    if (!selectedBooking || !extensionForm.extendToDate) {
+      toast({
+        variant: 'destructive',
+        title: 'Missing Information',
+        description: 'Please select an extension date.',
+      });
+      return;
+    }
+
+    const vehicle = vehicles.find(v => v.id === selectedBooking.vehicleId);
+    if (!vehicle) return;
+
+    // Validate that extension date is after current end date
+    const currentEndDate = new Date(selectedBooking.endDate);
+    const newEndDate = new Date(extensionForm.extendToDate);
+    
+    if (newEndDate <= currentEndDate) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid Date',
+        description: 'Extension date must be after the current return date.',
+      });
+      return;
+    }
+
+    // Find or create conversation with provider
+    let conversation = conversations.find((c: Conversation) =>
+      c.participants.includes(user!.id) &&
+      c.participants.includes(vehicle.providerId) &&
+      c.vehicleId === selectedBooking.vehicleId
+    );
+
+    if (!conversation) {
+      conversation = {
+        id: `conv-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        participants: [user!.id, vehicle.providerId],
+        lastActivity: new Date().toISOString(),
+        vehicleId: selectedBooking.vehicleId,
+      };
+      setConversations([...conversations, conversation]);
+    }
+
+    // Calculate extension days
+    const extensionDays = Math.ceil((newEndDate.getTime() - currentEndDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    // Create extension request message
+    const messageContent = `🔔 EXTENSION REQUEST\n\nI would like to extend my rental for ${vehicle.model}.\n\nCurrent Return Date: ${format(currentEndDate, 'MMM d, yyyy')}\nRequested Extension: ${format(newEndDate, 'MMM d, yyyy')} (+${extensionDays} day${extensionDays > 1 ? 's' : ''})\n${extensionForm.reason ? `\nReason: ${extensionForm.reason}` : ''}\n\nPlease let me know if this is possible. Thank you!`;
+
+    const newMessage: Message = {
+      id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      conversationId: conversation.id,
+      senderId: user!.id,
+      content: messageContent,
+      timestamp: new Date().toISOString(),
+      read: false,
+    };
+
+    // Save message
+    const messagesKey = `sakay-cebu-messages-${conversation.id}`;
+    const existingMessages = JSON.parse(localStorage.getItem(messagesKey) || '[]') as Message[];
+    localStorage.setItem(messagesKey, JSON.stringify([...existingMessages, newMessage]));
+
+    // Update conversation
+    const updatedConversations = conversations.map((c: Conversation) => {
+      if (c.id === conversation!.id) {
+        return {
+          ...c,
+          lastActivity: newMessage.timestamp,
+          lastMessage: newMessage,
+        };
+      }
+      return c;
+    }).filter(Boolean);
+
+    if (!conversations.find(c => c.id === conversation!.id)) {
+      updatedConversations.push({
+        ...conversation,
+        lastActivity: newMessage.timestamp,
+        lastMessage: newMessage,
+      });
+    }
+
+    setConversations(updatedConversations);
+    setIsExtensionModalOpen(false);
+    setSelectedBooking(null);
+
+    toast({
+      title: 'Extension Request Sent',
+      description: `Your extension request has been sent to the provider.`,
+    });
+  };
+
   if (isLoading || !user) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Clock className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -116,7 +228,7 @@ export default function DashboardPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'pending': return <Hourglass className="h-4 w-4" />;
+      case 'pending': return <Clock className="h-4 w-4" />;
       case 'active': return <CheckCircle className="h-4 w-4" />;
       case 'completed': return <CheckCircle className="h-4 w-4" />;
       case 'cancelled': return <XCircle className="h-4 w-4" />;
@@ -238,6 +350,18 @@ export default function DashboardPage() {
                   </AlertDialogContent>
                 </AlertDialog>
               )}
+
+              {booking.status === 'active' && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => handleRequestExtension(booking)}
+                >
+                  <CalendarPlus className="mr-2 h-4 w-4" />
+                  Request Extension
+                </Button>
+              )}
             </CardContent>
           </div>
         </div>
@@ -292,7 +416,7 @@ export default function DashboardPage() {
               <ScrollArea className="h-full">
                 {pendingBookings.length === 0 ? (
                   <div className="text-center py-12">
-                    <Hourglass className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <p className="text-muted-foreground">No pending rentals</p>
                   </div>
                 ) : (
@@ -363,6 +487,83 @@ export default function DashboardPage() {
           </Card>
         )}
       </div>
+
+      {/* Extension Request Modal */}
+      <Dialog open={isExtensionModalOpen} onOpenChange={setIsExtensionModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request Rental Extension</DialogTitle>
+            <DialogDescription>
+              {selectedBooking && (() => {
+                const vehicle = vehicles.find(v => v.id === selectedBooking.vehicleId);
+                return vehicle ? `Extend your rental for ${vehicle.model}` : '';
+              })()}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedBooking && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 text-sm bg-muted p-3 rounded-lg">
+                <div>
+                  <p className="font-medium text-muted-foreground">Current Return Date</p>
+                  <p className="font-semibold mt-1">
+                    {format(new Date(selectedBooking.endDate), 'MMM d, yyyy')}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-medium text-muted-foreground">Current Total</p>
+                  <p className="font-semibold mt-1">
+                    ₱{selectedBooking.totalPrice.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="extendToDate">Extend up to *</Label>
+                <Input
+                  id="extendToDate"
+                  type="date"
+                  value={extensionForm.extendToDate}
+                  min={format(new Date(new Date(selectedBooking.endDate).getTime() + 86400000), 'yyyy-MM-dd')}
+                  onChange={(e) => setExtensionForm({ ...extensionForm, extendToDate: e.target.value })}
+                />
+                {extensionForm.extendToDate && (
+                  <p className="text-xs text-muted-foreground">
+                    +{Math.ceil((new Date(extensionForm.extendToDate).getTime() - new Date(selectedBooking.endDate).getTime()) / (1000 * 60 * 60 * 24))} additional day(s)
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="reason">Reason (Optional)</Label>
+                <Textarea
+                  id="reason"
+                  placeholder="Let the provider know why you need an extension..."
+                  value={extensionForm.reason}
+                  onChange={(e) => setExtensionForm({ ...extensionForm, reason: e.target.value })}
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setIsExtensionModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={handleSubmitExtension}
+                >
+                  <Send className="mr-2 h-4 w-4" />
+                  Send Request
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -348,8 +348,9 @@ export default function VehiclesPage() {
                   className={`hover:shadow-lg transition-shadow cursor-pointer ${!isAvailable ? 'opacity-75' : ''}`}
                   onClick={() => handleVehicleClick(vehicle)}
                 >
-                  <CardContent className="p-4">
-                    <div className="h-48 bg-muted rounded-lg mb-4 overflow-hidden relative">
+                  <CardContent className="p-0">
+                    {/* Image with 4:3 aspect ratio */}
+                    <div className="relative w-full aspect-[4/3] bg-muted overflow-hidden">
                       {isBase64 ? (
                         <img 
                           src={vehicle.photos[0]} 
@@ -370,31 +371,67 @@ export default function VehiclesPage() {
                         </Badge>
                       )}
                     </div>
-                    <div className="flex justify-between items-start mb-2">
-                      <CardTitle className="text-lg">{vehicle.model}</CardTitle>
-                      {vehicle.verified && (
-                        <Badge variant="default" className="bg-green-500">Verified</Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground mb-2">
-                      <MapPin className="h-4 w-4 mr-1" />
-                      {vehicle.location}
-                    </div>
-                    <div className="flex items-center mb-3">
-                      <Badge variant="secondary">{vehicle.type}</Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-lg">₱{vehicle.pricePerDay.toLocaleString()}/day</span>
-                      <Button 
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRentNow(vehicle);
-                        }}
-                        disabled={!isAvailable}
-                      >
-                        {isAvailable ? 'Rent Now' : 'Unavailable'}
-                      </Button>
+                    
+                    {/* Card Content */}
+                    <div className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <CardTitle className="text-lg">{vehicle.model}</CardTitle>
+                        {vehicle.verified && (
+                          <Badge variant="default" className="bg-green-500">Verified</Badge>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center text-sm text-muted-foreground mb-3">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        {vehicle.location}
+                      </div>
+                      
+                      {/* Vehicle Type Badge */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <Badge variant="secondary">{vehicle.type}</Badge>
+                      </div>
+                      
+                      {/* Extended Vehicle Info */}
+                      <div className="grid grid-cols-2 gap-2 mb-3 text-xs text-muted-foreground">
+                        {vehicle.yearModel && (
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            <span>{vehicle.yearModel}</span>
+                          </div>
+                        )}
+                        {vehicle.transmission && (
+                          <div className="flex items-center gap-1">
+                            <span className="font-semibold">⚙️</span>
+                            <span>{vehicle.transmission}</span>
+                          </div>
+                        )}
+                        {vehicle.fuelType && (
+                          <div className="flex items-center gap-1">
+                            <span className="font-semibold">⛽</span>
+                            <span>{vehicle.fuelType}</span>
+                          </div>
+                        )}
+                        {vehicle.seatingCapacity && (
+                          <div className="flex items-center gap-1">
+                            <User className="h-3 w-3" />
+                            <span>{vehicle.seatingCapacity} seats</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <span className="font-bold text-lg">₱{vehicle.pricePerDay.toLocaleString()}/day</span>
+                        <Button 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRentNow(vehicle);
+                          }}
+                          disabled={!isAvailable}
+                        >
+                          {isAvailable ? 'Rent Now' : 'Unavailable'}
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -422,7 +459,7 @@ export default function VehiclesPage() {
                     const isBase64 = photo.startsWith('data:image');
                     return (
                       <CarouselItem key={index}>
-                        <div className="h-[300px] sm:h-[400px] bg-muted rounded-lg overflow-hidden">
+                        <div className="h-[400px] sm:h-[400px] bg-muted rounded-lg overflow-hidden">
                           {isBase64 ? (
                             <img 
                               src={photo} 
@@ -478,6 +515,64 @@ export default function VehiclesPage() {
                 <div>
                   <h3 className="font-semibold mb-2">Description</h3>
                   <p className="text-muted-foreground">{selectedVehicle.description}</p>
+                </div>
+
+                <Separator />
+
+                {/* Vehicle Specifications */}
+                <div>
+                  <h3 className="font-semibold mb-3">Vehicle Specifications</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {selectedVehicle.yearModel && (
+                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                        <Calendar className="h-5 w-5 text-primary" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Year Model</p>
+                          <p className="font-semibold">{selectedVehicle.yearModel}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedVehicle.transmission && (
+                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                        <span className="text-2xl">⚙️</span>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Transmission</p>
+                          <p className="font-semibold">{selectedVehicle.transmission}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedVehicle.fuelType && (
+                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                        <span className="text-2xl">⛽</span>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Fuel Type</p>
+                          <p className="font-semibold">{selectedVehicle.fuelType}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedVehicle.seatingCapacity && (
+                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                        <User className="h-5 w-5 text-primary" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Seating Capacity</p>
+                          <p className="font-semibold">{selectedVehicle.seatingCapacity} seats</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedVehicle.mileage && (
+                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                        <span className="text-2xl">📏</span>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Mileage</p>
+                          <p className="font-semibold">{selectedVehicle.mileage.toLocaleString()} km</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <Separator />

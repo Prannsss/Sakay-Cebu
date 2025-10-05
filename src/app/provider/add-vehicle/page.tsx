@@ -25,6 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useRef } from 'react';
 import { Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { initialVehicles } from '@/lib/data';
+import { LocationAutocomplete } from '@/components/ui/location-autocomplete';
 
 const formSchema = z.object({
   model: z.string().min(2, 'Model is too short'),
@@ -32,6 +33,11 @@ const formSchema = z.object({
   location: z.string().min(2, 'Location is too short'),
   pricePerDay: z.coerce.number().min(1, 'Price must be positive'),
   description: z.string().min(10, 'Description is too short'),
+  yearModel: z.coerce.number().min(1900, 'Invalid year').max(new Date().getFullYear() + 1, 'Year cannot be in the future'),
+  mileage: z.coerce.number().min(0, 'Mileage must be positive'),
+  fuelType: z.enum(['Gasoline', 'Diesel', 'Electric', 'Hybrid']),
+  transmission: z.enum(['Automatic', 'Manual']),
+  seatingCapacity: z.coerce.number().min(1, 'Must have at least 1 seat').max(50, 'Invalid seating capacity'),
 });
 
 export default function AddVehiclePage() {
@@ -59,6 +65,11 @@ export default function AddVehiclePage() {
       model: '',
       location: '',
       description: '',
+      yearModel: new Date().getFullYear(),
+      mileage: 0,
+      fuelType: 'Gasoline',
+      transmission: 'Automatic',
+      seatingCapacity: 5,
     },
   });
 
@@ -283,12 +294,86 @@ export default function AddVehiclePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                 control={form.control}
-                name="location"
+                name="yearModel"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Location</FormLabel>
+                    <FormLabel>Year Model</FormLabel>
                     <FormControl>
-                        <Input placeholder="e.g., Cebu City" {...field} />
+                        <Input type="number" placeholder="e.g., 2022" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="mileage"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Mileage (km)</FormLabel>
+                    <FormControl>
+                        <Input type="number" placeholder="e.g., 45000" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                control={form.control}
+                name="fuelType"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Fuel Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select fuel type" />
+                        </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                        <SelectItem value="Gasoline">Gasoline</SelectItem>
+                        <SelectItem value="Diesel">Diesel</SelectItem>
+                        <SelectItem value="Electric">Electric</SelectItem>
+                        <SelectItem value="Hybrid">Hybrid</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="transmission"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Transmission</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select transmission type" />
+                        </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                        <SelectItem value="Automatic">Automatic</SelectItem>
+                        <SelectItem value="Manual">Manual</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                control={form.control}
+                name="seatingCapacity"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Seating Capacity</FormLabel>
+                    <FormControl>
+                        <Input type="number" placeholder="e.g., 5" {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -308,6 +393,23 @@ export default function AddVehiclePage() {
                 )}
                 />
             </div>
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Location</FormLabel>
+                  <FormControl>
+                    <LocationAutocomplete
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Start typing location..."
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="description"

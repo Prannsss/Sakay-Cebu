@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Vehicle } from '@/lib/types';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { MapPin, Tag } from 'lucide-react';
+import { MapPin, Tag, Calendar, Fuel, Gauge, Users } from 'lucide-react';
 import { Badge } from '../ui/badge';
 
 interface VehicleCardProps {
@@ -49,13 +49,29 @@ const VehicleCard = ({ vehicle }: VehicleCardProps) => {
           <Link href={`/vehicles/${vehicle.id}`}>{vehicle.model}</Link>
         </CardTitle>
         <div className="space-y-2 text-sm text-muted-foreground">
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <Badge variant="outline">{vehicle.type}</Badge>
+            {vehicle.yearModel && (
+              <Badge variant="secondary">{vehicle.yearModel}</Badge>
+            )}
           </div>
           <div className="flex items-center">
             <MapPin className="mr-2 h-4 w-4" />
-            <span>{vehicle.location}</span>
+            <span className="truncate">{vehicle.location}</span>
           </div>
+          {vehicle.transmission && (
+            <div className="flex items-center">
+              <Gauge className="mr-2 h-4 w-4" />
+              <span>{vehicle.transmission}</span>
+              {vehicle.fuelType && <span className="ml-2">• {vehicle.fuelType}</span>}
+            </div>
+          )}
+          {vehicle.seatingCapacity && (
+            <div className="flex items-center">
+              <Users className="mr-2 h-4 w-4" />
+              <span>{vehicle.seatingCapacity} seats</span>
+            </div>
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex items-center justify-between p-4 bg-secondary/30">

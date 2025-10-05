@@ -32,6 +32,11 @@ export default function AllVehiclesPage() {
     pricePerDay: 0,
     description: '',
     photos: [] as string[],
+    yearModel: undefined as number | undefined,
+    mileage: undefined as number | undefined,
+    fuelType: undefined as Vehicle['fuelType'],
+    transmission: undefined as Vehicle['transmission'],
+    seatingCapacity: undefined as number | undefined,
   });
   const [photoInput, setPhotoInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -88,6 +93,11 @@ export default function AllVehiclesPage() {
       pricePerDay: vehicle.pricePerDay,
       description: vehicle.description,
       photos: [...vehicle.photos],
+      yearModel: vehicle.yearModel,
+      mileage: vehicle.mileage,
+      fuelType: vehicle.fuelType,
+      transmission: vehicle.transmission,
+      seatingCapacity: vehicle.seatingCapacity,
     });
     setIsEditModalOpen(true);
   };
@@ -221,6 +231,11 @@ export default function AllVehiclesPage() {
           pricePerDay: editForm.pricePerDay,
           description: editForm.description,
           photos: editForm.photos,
+          yearModel: editForm.yearModel,
+          mileage: editForm.mileage,
+          fuelType: editForm.fuelType,
+          transmission: editForm.transmission,
+          seatingCapacity: editForm.seatingCapacity,
         };
       }
       return v;
@@ -439,6 +454,104 @@ export default function AllVehiclesPage() {
                 onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
                 placeholder="e.g., Cebu City"
               />
+            </div>
+
+            {/* Vehicle Specifications */}
+            <div className="space-y-4 pt-2 border-t">
+              <h3 className="font-semibold text-sm">Vehicle Specifications (Optional)</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="yearModel">Year Model</Label>
+                  <Input
+                    id="yearModel"
+                    type="number"
+                    value={editForm.yearModel || ''}
+                    onChange={(e) => setEditForm(prev => ({ 
+                      ...prev, 
+                      yearModel: e.target.value ? parseInt(e.target.value) : undefined 
+                    }))}
+                    placeholder="e.g., 2024"
+                    min="1900"
+                    max={new Date().getFullYear() + 1}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="mileage">Mileage (km)</Label>
+                  <Input
+                    id="mileage"
+                    type="number"
+                    value={editForm.mileage || ''}
+                    onChange={(e) => setEditForm(prev => ({ 
+                      ...prev, 
+                      mileage: e.target.value ? parseInt(e.target.value) : undefined 
+                    }))}
+                    placeholder="e.g., 15000"
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fuelType">Fuel Type</Label>
+                  <Select
+                    value={editForm.fuelType || ''}
+                    onValueChange={(value) => setEditForm(prev => ({ 
+                      ...prev, 
+                      fuelType: value ? value as Vehicle['fuelType'] : undefined 
+                    }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select fuel type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Gasoline">Gasoline</SelectItem>
+                      <SelectItem value="Unleaded">Unleaded</SelectItem>
+                      <SelectItem value="Petrol">Petrol</SelectItem>
+                      <SelectItem value="Diesel">Diesel</SelectItem>
+                      <SelectItem value="Electric">Electric</SelectItem>
+                      <SelectItem value="Hybrid">Hybrid</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="transmission">Transmission</Label>
+                  <Select
+                    value={editForm.transmission || ''}
+                    onValueChange={(value) => setEditForm(prev => ({ 
+                      ...prev, 
+                      transmission: value ? value as Vehicle['transmission'] : undefined 
+                    }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select transmission" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Automatic">Automatic</SelectItem>
+                      <SelectItem value="Manual">Manual</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="seatingCapacity">Seating Capacity</Label>
+                <Input
+                  id="seatingCapacity"
+                  type="number"
+                  value={editForm.seatingCapacity || ''}
+                  onChange={(e) => setEditForm(prev => ({ 
+                    ...prev, 
+                    seatingCapacity: e.target.value ? parseInt(e.target.value) : undefined 
+                  }))}
+                  placeholder="e.g., 5"
+                  min="1"
+                  max="50"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

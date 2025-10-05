@@ -7,6 +7,7 @@ import {
   Car,
   LayoutDashboard,
   LogIn,
+  LogOut,
   PlusCircle,
   Sparkles,
   UserPlus,
@@ -23,7 +24,7 @@ import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import Logo from '@/components/Logo';
 
 const AppSidebar = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const pathname = usePathname();
 
   const navLinks = [
@@ -89,21 +90,31 @@ const AppSidebar = () => {
       </nav>
       <div className="mt-auto border-t p-4 space-y-2">
         {user ? (
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-left h-auto"
-            asChild
-          >
-            <Link href="/profile">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 flex-shrink-0">
-                <User className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex flex-col ml-2">
-                <span className="font-medium text-sm">{user.name}</span>
-                <span className="text-xs text-muted-foreground">{user.email}</span>
-              </div>
-            </Link>
-          </Button>
+          <>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start text-left h-auto"
+              asChild
+            >
+              <Link href="/profile">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 flex-shrink-0">
+                  <User className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex flex-col ml-2">
+                  <span className="font-medium text-sm">{user.name}</span>
+                  <span className="text-xs text-muted-foreground">{user.email}</span>
+                </div>
+              </Link>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full justify-start text-destructive hover:text-destructive"
+              onClick={logout}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          </>
         ) : (
           <div className="space-y-2">
             <Button variant="outline" className="w-full" asChild>

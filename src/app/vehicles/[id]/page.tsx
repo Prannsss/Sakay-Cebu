@@ -10,13 +10,14 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, MapPin } from 'lucide-react';
+import { Loader2, MapPin, Calendar as CalendarIcon, Fuel, Gauge, Users, Settings } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { DateRange } from 'react-day-picker';
 import { addDays, differenceInDays } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Separator } from '@/components/ui/separator';
 
 export default function VehicleDetailsPage() {
   const { id } = useParams();
@@ -123,14 +124,57 @@ export default function VehicleDetailsPage() {
             </div>
             <div className="space-y-4">
                 <h1 className="text-4xl font-bold font-headline">{vehicle.model}</h1>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 flex-wrap">
                     <Badge variant="secondary" className="text-md">{vehicle.type}</Badge>
+                    {vehicle.yearModel && (
+                      <Badge variant="outline" className="text-md">{vehicle.yearModel}</Badge>
+                    )}
                     <div className="flex items-center text-muted-foreground">
                         <MapPin className="mr-2 h-4 w-4" />
                         <span>{vehicle.location}</span>
                     </div>
                 </div>
                 <p className="text-lg text-muted-foreground">{vehicle.description}</p>
+                
+                {/* Extended Vehicle Details */}
+                <div className="mt-6 space-y-3 border rounded-lg p-4 bg-secondary/20">
+                  <h3 className="font-semibold text-lg mb-3">Vehicle Specifications</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {vehicle.transmission && (
+                      <div className="flex items-center">
+                        <Settings className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          <span className="font-medium">Transmission:</span> {vehicle.transmission}
+                        </span>
+                      </div>
+                    )}
+                    {vehicle.fuelType && (
+                      <div className="flex items-center">
+                        <Fuel className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          <span className="font-medium">Fuel:</span> {vehicle.fuelType}
+                        </span>
+                      </div>
+                    )}
+                    {vehicle.seatingCapacity && (
+                      <div className="flex items-center">
+                        <Users className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          <span className="font-medium">Capacity:</span> {vehicle.seatingCapacity} seats
+                        </span>
+                      </div>
+                    )}
+                    {vehicle.mileage !== undefined && vehicle.mileage > 0 && (
+                      <div className="flex items-center">
+                        <Gauge className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">
+                          <span className="font-medium">Mileage:</span> {vehicle.mileage.toLocaleString()} km
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
                 <div className="text-3xl font-bold">
                     ₱{vehicle.pricePerDay.toLocaleString()}
                     <span className="text-lg font-normal text-muted-foreground">/day</span>
