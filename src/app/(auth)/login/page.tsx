@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap } from 'lucide-react';
+import Image from 'next/image';
 
 import LoginForm from '@/components/auth/LoginForm';
 import SignUpForm from '@/components/auth/SignUpForm';
@@ -30,8 +30,8 @@ const AuthPage = () => {
           animate={{ x: isSignup ? '0%' : '100%' }}
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
-          <div className='flex flex-col items-center gap-4'>
-            <Zap className="h-16 w-16" />
+          <div className='flex flex-col items-center'>
+            <Image src="/favicon.ico" alt="Sakay Cebu Logo" width={140} height={140} className="h-32 w-32 -mb-10" />
             <span className="text-2xl font-bold font-headline">Sakay Cebu</span>
           </div>
         </motion.div>

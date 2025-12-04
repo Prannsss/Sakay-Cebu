@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Zap } from 'lucide-react';
+import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
 
 const Logo = () => {
@@ -14,8 +14,8 @@ const Logo = () => {
   };
 
   return (
-    <Link href={getRedirectUrl()} className="flex items-center gap-2 text-xl font-bold text-primary">
-        <Zap className="h-6 w-6" />
+    <Link href={getRedirectUrl()} className="flex items-center text-xl font-bold text-primary">
+        <Image src="/favicon-1.png" alt="Sakay Cebu Logo" width={64} height={64} className="h-16 w-16 -mr-[-2]" />
         <span className="font-headline">Sakay Cebu</span>
     </Link>
   );
