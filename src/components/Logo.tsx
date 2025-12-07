@@ -14,8 +14,8 @@ const Logo = () => {
   };
 
   return (
-    <Link href={getRedirectUrl()} className="flex items-center text-xl font-bold text-primary">
-        <Image src="/favicon-1.png" alt="Sakay Cebu Logo" width={64} height={64} className="h-16 w-16 -mr-[-2]" />
+    <Link href={getRedirectUrl()} className="flex items-center gap-2 text-xl font-bold text-primary">
+        <Image src="/favicon.ico" alt="Sakay Cebu Logo" width={48} height={48} className="h-24 w-24 object-contain" />
         <span className="font-headline">Sakay Cebu</span>
     </Link>
   );

@@ -31,7 +31,7 @@ export function LocationAutocomplete({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const debounceTimerRef = useRef<NodeJS.Timeout>();
+  const debounceTimerRef = useRef<NodeJS.Timeout>(undefined);
 
   // Format location as "Barangay, Municipality, Cebu"
   const formatLocation = (location: CebuLocation): string => {

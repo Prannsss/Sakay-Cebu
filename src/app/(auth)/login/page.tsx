@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import LoginForm from '@/components/auth/LoginForm';
 import SignUpForm from '@/components/auth/SignUpForm';
@@ -30,10 +31,10 @@ const AuthPage = () => {
           animate={{ x: isSignup ? '0%' : '100%' }}
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
-          <div className='flex flex-col items-center'>
-            <Image src="/favicon.ico" alt="Sakay Cebu Logo" width={140} height={140} className="h-32 w-32 -mb-10" />
+          <Link href="/" className='flex flex-col items-center hover:opacity-90 transition-opacity'>
+            <Image src="/logo.svg" alt="Sakay Cebu Logo" width={140} height={140} className="h-48 w-48 -mb-8" />
             <span className="text-2xl font-bold font-headline">Sakay Cebu</span>
-          </div>
+          </Link>
         </motion.div>
 
         {/* Mobile Only - Simple form switching without animation */}
